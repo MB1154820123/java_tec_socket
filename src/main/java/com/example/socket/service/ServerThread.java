@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
-public class ServerThread extends  Thread{
+public class ServerThread extends  Thread {
     private  InputStream inputStream;
     private  OutputStream outputStream;
     private  InputStreamReader inputStreamReader;
@@ -36,9 +36,7 @@ public class ServerThread extends  Thread{
 
     @Override
     public void run(){
-
-
-        try {
+    try {
             this.inputStream = currentSocket.getInputStream();
             this.outputStream = currentSocket.getOutputStream();
         } catch (IOException e) {
@@ -48,7 +46,6 @@ public class ServerThread extends  Thread{
         this.outputStreamWriter = new OutputStreamWriter(this.outputStream);
         this.bufferedReader = new BufferedReader(this.inputStreamReader);
         this.bufferedWriter = new BufferedWriter(this.outputStreamWriter);
-
         System.out.println("当前在线人数：" + accounts.size());
         System.out.println( account + "\t加入了本Socket服务...");
         if (accounts.size()==1) {
@@ -101,13 +98,16 @@ public class ServerThread extends  Thread{
 
      }
 
-    @Override
-    public void start(){
-        if ( null==t ) {
-            t = new Thread(this,this.threadName);
-            t.start();
-        }
-    }
+//    @Override
+//    public void start(){
+//        if ( null == t ) {
+//            // 此处this指的是类com.example.socket.service.ServerThread当前实例
+//            System.out.println("ServerThread属于Runnable吗："+(this instanceof Runnable));
+//            System.out.println("ServerThread属于Tread吗："+(this instanceof Thread));
+//            t = new Thread(this,this.threadName);
+//            t.start();
+//        }
+//    }
 
     /**
      * 打印出用户发来的消息
@@ -129,7 +129,6 @@ public class ServerThread extends  Thread{
                 continue;
             }
         }
-
         if ( null == s ) {
              System.out.println("你选则的聊天对象："+socketId+"不存在...");
         }

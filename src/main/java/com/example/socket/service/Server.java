@@ -10,13 +10,14 @@ public class Server{
         try {
             ServerSocket serverSocket = new ServerSocket(8080);
             System.out.println("*************服务端启动成功，等待客户端连接**********");
-            // 阻塞监听连接的建立
+            /**
+             * 说明：阻塞循环，监听accept()，以获取每一个连接上来的socket
+             */
             while ( true ) {
                 socket = serverSocket.accept();
                 String account = String.valueOf( socket.getPort() );
                 ServerThread serverThread = new ServerThread( account,socket );
                 serverThread.start();
-
             }
         } catch (IOException e) {
             e.printStackTrace();
