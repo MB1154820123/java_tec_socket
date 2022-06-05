@@ -10,7 +10,7 @@ public class Server{
     private static Socket socket;
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(8080);
+            ServerSocket serverSocket = new ServerSocket(9090);
             System.out.println("*************服务端启动成功，等待客户端连接**********");
             /**
              * 说明：阻塞循环，监听accept()，以获取每一个连接上来的socket
@@ -20,8 +20,10 @@ public class Server{
                 socket = serverSocket.accept();
                 set.add(socket);
                 System.out.println("SET:"+set.toString());
-                ServerThread serverThread = new ServerThread(set);
-                serverThread.start();
+                ServerReadThread serverReadThread = new ServerReadThread(set);
+                ServerWriteThread serverWriteThread = new ServerWriteThread(set);
+                serverReadThread.start();
+                serverWriteThread.start();
             }
         } catch (IOException e) {
             e.printStackTrace();

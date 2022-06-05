@@ -1,17 +1,19 @@
 package com.example.socket.service;
+
+import lombok.SneakyThrows;
+
 import java.io.*;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Scanner;
+import java.util.Set;
 
-public class ServerThread extends  Thread {
+public class ServerWriteThread extends  Thread {
 private Set<Socket> socketSet;
 private Scanner sc = new Scanner(System.in);
-SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public ServerThread(Set<Socket> set) {
+    public ServerWriteThread(Set<Socket> set) {
         this.socketSet = set;
     }
-
+    @SneakyThrows
     @Override
     public void run(){
         System.out.println("当前连线人数有"+socketSet.size()+"人...");
@@ -23,34 +25,32 @@ SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (sc.hasNext() && sc.next().equals("Y")) {
                 System.out.println("与" + socket.getPort() + "建立了通信通道，请输入您要发送的消息，并按Enter键发送...");
                 while ( true ) {
-                    Scanner scWrite = new Scanner(System.in);
                     // 写
-                    if (scWrite.hasNext() && !scWrite.next().equals("Exit")) {
+                    String temp = sc.next();
+                    if ( null != temp && !temp.contains("Exit")) {
                         try {
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                            writer.write(scWrite.next()+"\n");
+                            writer.write(temp+"\n");
                             writer.flush();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                    } else if ( temp.contains("Exit") )  {
+                        System.out.println("已退出与"+socket.getPort()+"的会话，当前连线人有("+socketSet+")，请选择沟通对象：");
+                        for (Socket s : socketSet) {
+                            if ( sc.next() .contains( String.valueOf(s.getPort()) ) ) {
+                                System.out.println("您选择的沟通对象为："+s.getPort()+"请输入消息并按Enter键发送：");
+                                if ( sc.hasNext() ) {
+                                    String temp_ = sc.next();
+                                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+                                    writer.write(temp_+"\n");
+                                    writer.flush();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-                // 读
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if ( null != reader.readLine() ){
-                        System.out.println("["+sdf.format(new Date())+"]"+socket.getPort()+"说:"+reader.readLine());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
        else {
             System.out.println("请选择发消息模式：\n 1.群发 \n 2.私发");
