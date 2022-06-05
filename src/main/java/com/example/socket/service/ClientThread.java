@@ -2,61 +2,46 @@ package com.example.socket.service;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
-public class ClientThread implements Runnable{
-    private String threadName;
-    private Thread thread;
+public class ClientThread extends Thread {
     private Socket socket;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public ClientThread(String threadName,Socket socket) {
-        this.threadName = threadName;
+    public ClientThread(Socket socket) {
         this.socket = socket;
     }
 
-
-
     @Override
     public void run() {
-        try {
-            InputStream inputStream = socket.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            OutputStream outputStream = socket.getOutputStream();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-
-                // 循环打印服务端发来的消息
-                System.out.println("服务端说：" + bufferedReader.readLine());
-
-                // 循环向服务端发消息
-                if (scanner.hasNext()) {
-
-                    bufferedWriter.write(socket.getLocalPort() + "\t说：" + scanner.next() + "\n");
-                    bufferedWriter.flush();
-
-                }
+        System.out.println("Client_Socket:"+socket);
+        while ( true ) {
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                System.out.println("["+sdf.format(new Date())+"]服务器说:"+reader.readLine());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    public void my_start(){
-        if(null==thread){
-          thread = new Thread(this,this.threadName);
-          thread.start();
-        }
+    // 读消息
+    public void read () throws IOException {
+
     }
-
-    public Socket returnSocket() throws IOException {
-        if (null == socket) {
-            socket = new Socket("127.0.0.1", 8080);
+    // 写消息
+    public void write () throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        System.out.println("请输入您要发送给服务器的消息：");
+        Scanner scanner = new Scanner(System.in);
+        while ( scanner.hasNext() ) {
+            if ( "Exit" != scanner.next() ) {
+                writer.write(scanner.next() + "\n");
+                writer.flush();
+            }
         }
-        return  socket;
-
     }
 
 }

@@ -3,6 +3,8 @@ package com.example.socket.service;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Server{
     private static Socket socket;
@@ -13,10 +15,12 @@ public class Server{
             /**
              * 说明：阻塞循环，监听accept()，以获取每一个连接上来的socket
              */
+            Set<Socket> set = new HashSet<>();
             while ( true ) {
                 socket = serverSocket.accept();
-                String account = String.valueOf( socket.getPort() );
-                ServerThread serverThread = new ServerThread( account,socket );
+                set.add(socket);
+                System.out.println("SET:"+set.toString());
+                ServerThread serverThread = new ServerThread(set);
                 serverThread.start();
             }
         } catch (IOException e) {
